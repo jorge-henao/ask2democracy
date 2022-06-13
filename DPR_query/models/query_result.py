@@ -2,11 +2,11 @@ from typing import List
 from pydantic import BaseModel
 
 
-class DPRSearchResult(BaseModel): 
+class SearchResult(BaseModel): 
     query: str
     results: DPRSearchResultItem 
     
-class DPRSearchResultItem(BaseModel): 
+class SearchResultItem(BaseModel): 
     response: str
     document_id: int
     paragraph_context: str

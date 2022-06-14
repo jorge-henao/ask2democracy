@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import FastAPI
-from commands.elastic_command_repository import ElasticCommandRepository
+from repositories.proposals_commands_es_repository import ElasticCommandRepository
 import config
 import uvicorn
 

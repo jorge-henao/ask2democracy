@@ -7,5 +7,5 @@ class ProposalsCommands():
         self.repository = repository
         pass
     
-    def insert_document(self, document_path, source, titles_extract_pattern = None):
-        self.repository.insert_document(document_path, source, titles_extract_pattern)
+    def insert_document(self, document_path, source, es_index, start_page, titles_extract_pattern = None):
+        self.repository.insert_document(document_path, source, es_index, start_page, titles_extract_pattern)

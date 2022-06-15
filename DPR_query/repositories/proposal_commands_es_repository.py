@@ -1,4 +1,5 @@
 from multiprocessing import parent_process
+from operator import index
 import re
 import uuid
 import json
@@ -11,62 +12,79 @@ from repositories.proposal_commands_repository import DocumentCommandsRepository
 class ProposalCommandsESRepository(DocumentCommandsRepository):
     
     def __init__(self, es_host, es_index) -> None:
-        self.elastic_endpoint =  f"http://{es_host}:9200/{es_index}/_doc"
+        self.es_host = es_host
+        self.es_index = es_index
+        self.__set_elastic_endpoint(es_host, es_index)
         self.error_file = open('./errorwikioutput.txt','w+')
+        
+    def __set_elastic_endpoint(self, es_host, es_index):
+        self.es_host = es_host
+        self.es_index = es_index
     
-    def insert_document(self, document_path, source, titles_extract_pattern = None):
-        paragraphs = self.preproces_documents(document_path, source, titles_extract_pattern)
-        self.upload_paragraphs_to_cluster(paragraphs= paragraphs, source = source)
+    def get_elastic_endpoint(self):
+        return f"http://{self.es_host}:9200/{self.es_index}/_doc"
+    
+    def insert_document(self, document_path, source, es_index = None, start_page = 0, extract_paragraph_pattern = None):
+        if es_index is not None:
+            self.__set_elastic_endpoint(self.es_host, es_index)
+        paragraphs = self._preproces_documents(document_path, source, start_page, extract_paragraph_pattern)
+        self.__upload_paragraphs_to_cluster(paragraphs= paragraphs, source = source)
      
-    def preproces_documents(self, document_path, source, titles_extract_pattern):
-        if titles_extract_pattern is None:
-            paragraphs = self.extract_paragraphs_from_document(document_path, source = source)
+    def _preproces_documents(self, document_path, source, start_page, extract_paragraph_pattern):
+        if extract_paragraph_pattern is None:
+            paragraphs = self.__extract_pages_from_document(document_path, source = source, start_page = start_page)
         else: 
-            paragraphs = self.extract_paragraphs_from_document(document_path, titles_extract_pattern)
+            paragraphs = self.__extract_paragraphs_from_document(document_path, source, extract_paragraph_pattern, start_page)
         
         return paragraphs
     
-    def extract_paragraphs_from_document(self, document_path, pattern):
+    def __extract_paragraphs_from_document(self, document_path, source, pattern, start_page = 0):
         paragraphs = []
         try:
             current_title = ""
             with fitz.open(document_path) as doc:
+                i = 0
                 for page in doc:
+                    if i < start_page : i += 1; continue
                     text = page.get_text()
                     title = re.findall(pattern = pattern, string = text)
                     if len(title) > 0:
                         current_title = title[0].replace('\n','').replace('  ','-').replace(' ','').replace('-',' ').capitalize()
-                        current_title = f"{self.source} {current_title}"
-                        text = f"{current_title}\\n{text}"
-                        paragraphs.append({"title": current_title, "text" : text})
+                        current_title = f"{source} {current_title}"
+                    text = f"{current_title}\\n{text}"
+                    paragraphs.append({"title": current_title, "text" : text})
+                    i += 1
                 return paragraphs
         except Exception as ex:
             #self.error_file.write(title + str(len(text)) + ':' + str(ex) + '\\n')
             return paragraphs
         
-    def extract_paragraphs_from_document(self, document_path, source):
+    def __extract_pages_from_document(self, document_path, source, start_page = 0):
         paragraphs = []
         try:
+            i =0
             with fitz.open(document_path) as doc:
                 for page in doc:
+                    if i < start_page : i += 1; continue
                     text = page.get_text()
                     text = f"{source}\\n{text}"
-                    paragraphs.append({"title": "Petro", "text" : text})
+                    paragraphs.append({"title": source, "text" : text})
+                    i += 1
                 return paragraphs
         except Exception as ex:
             #self.error_file.write(title + str(len(text)) + ':' + str(ex) + '\\n')
             return paragraphs
     
-    def upload_paragraphs_to_cluster(self, paragraphs, source):
+    def __upload_paragraphs_to_cluster(self, paragraphs, source):
         p_index = 0
         for paragraph in paragraphs:
             title = paragraph['title']
             text = paragraph['text']  
             doc_id = str(uuid.uuid4())
-            self.upload_paragraph(title, text, p_index, doc_id, source)    
+            self.__upload_paragraph(title, text, p_index, doc_id, source)    
             p_index += 1
             
-    def upload_paragraph (self, title, p_content, p_index, doc_id, source):
+    def __upload_paragraph (self, title, p_content, p_index, doc_id, source):
         created_date = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         post_data  = {
             "document_id": doc_id,
@@ -80,5 +98,5 @@ class ProposalCommandsESRepository(DocumentCommandsRepository):
             "title": title
         }
 
-        r = requests.post(self.elastic_endpoint, json = post_data)
+        r = requests.post(self.get_elastic_endpoint(), json = post_data)
         print(r.text)      

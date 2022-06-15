@@ -1,5 +1,5 @@
 from multiprocessing import parent_process
-from repositories.proposals_commands_es_repository import DocumentCommandsRepository
+from repositories.proposal_commands_es_repository import DocumentCommandsRepository
 
 class ProposalsCommands():
     

@@ -6,12 +6,12 @@ import datetime
 import requests
 import fitz
 
-from repositories.proposals_commands_repository import DocumentCommandsRepository
+from repositories.proposal_commands_repository import DocumentCommandsRepository
 
 class ProposalCommandsESRepository(DocumentCommandsRepository):
     
-    def __init__(self, elastic_endpoint, source) -> None:
-        self.elastic_endpoint = elastic_endpoint
+    def __init__(self, es_host, es_index, source) -> None:
+        self.elastic_endpoint =  f"http://{es_host}:9200/{es_index}/_doc"
         self.source = source
         self.error_file = open('./errorwikioutput.txt','w+')
     

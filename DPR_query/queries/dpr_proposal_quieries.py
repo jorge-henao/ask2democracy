@@ -5,7 +5,7 @@ from haystack.document_stores import FAISSDocumentStore
 from haystack.nodes import Seq2SeqGenerator
 from core import bart_eli5_converter
 
-class DPRQueryCommandStack():
+class DPRProposalQueries():
     
     def __init__(self, faiss_document_store : FAISSDocumentStore, 
                  query_embedding_model : str, passage_embedding_model: str,

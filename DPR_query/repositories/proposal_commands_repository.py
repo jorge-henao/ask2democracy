@@ -7,5 +7,5 @@ class DocumentCommandsRepository(ABC):
         pass
     
     @abstractmethod
-    def preproces_documents(self, document_path):
+    def preproces_documents(self, document_path, source, titles_extract_pattern):
         pass

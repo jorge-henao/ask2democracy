@@ -6,23 +6,27 @@ import json
 import datetime
 import requests
 import fitz
-
+from base64 import b64encode
 from repositories.proposal_commands_repository import DocumentCommandsRepository
 
+        
 class ProposalCommandsESRepository(DocumentCommandsRepository):
     
-    def __init__(self, es_host, es_index) -> None:
+    def __init__(self, es_host, es_index, es_user, es_password) -> None:
         self.es_host = es_host
         self.es_index = es_index
         self.__set_elastic_endpoint(es_host, es_index)
         self.error_file = open('./errorwikioutput.txt','w+')
-        
+        credentials = f"{es_user}:{es_password}"
+        self.credentials = b64encode(b"elastic:siKAHmmk2flwEaKNqQVZwp49").decode("ascii")
+        self.auth_header = { 'Authorization' : 'Basic %s' %  self.credentials }
+    
     def __set_elastic_endpoint(self, es_host, es_index):
         self.es_host = es_host
         self.es_index = es_index
     
     def get_elastic_endpoint(self):
-        return f"http://{self.es_host}:9200/{self.es_index}/_doc"
+        return f"https://{self.es_host}:443/{self.es_index}/_doc"
     
     def insert_document(self, document_path, source, es_index = None, start_page = 0, extract_paragraph_pattern = None):
         if es_index is not None:
@@ -98,5 +102,5 @@ class ProposalCommandsESRepository(DocumentCommandsRepository):
             "title": title
         }
 
-        r = requests.post(self.get_elastic_endpoint(), json = post_data)
+        r = requests.post(self.get_elastic_endpoint(), json = post_data, headers = self.auth_header)
         print(r.text)      

@@ -4,7 +4,7 @@ A semantic search system to help with democratic discussions like polical contes
 Hugging Face space to explore the final report released by the "Comision de la verdad":
 https://huggingface.co/spaces/jorge-henao/ask2democracycol
 
-Hugging face space with a seq2seq model trained with the testimonal volume with the voice of the victims
+Hugging face space with a seq2seq story generator trained with the colombian victims voice
 https://huggingface.co/spaces/jorge-henao/historias-conflicto-col
 
 Hugging face space to explore presidential candidates' proposals (2022 Colombian presidential contest)

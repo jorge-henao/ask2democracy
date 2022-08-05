@@ -1,4 +1,4 @@
-# ask_to_democracy
+# ask2democracy
 A semantic search system to help with democratic discussions like polical contests and the historic memory knowledge, in spanish/colombian conflic context.
 
 Hugging Face space to explore the final report released by the "Comision de la verdad":

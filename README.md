@@ -1,5 +1,5 @@
 # ask2democracy
-A semantic search system to help with democratic discussions like polical contests and the historic memory knowledge, in spanish/colombian conflic context.
+An augmented retrieval semantic search system to help with democratic discussions like polical contests and the historic memory knowledge, in spanish/colombian conflic context.
 
 Hugging Face space to explore the final report released by the "Comision de la verdad":
 https://huggingface.co/spaces/jorge-henao/ask2democracycol
